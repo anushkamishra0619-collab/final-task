@@ -2,12 +2,17 @@ import {
   FaCrosshairs, FaLocationArrow, FaMapMarkerAlt, FaExchangeAlt, FaSearch,
 } from "react-icons/fa";
 import { stations } from "../data/network";
+import AnimatedBackground from "./AnimatedBackground";
+
+
 
 export default function SearchForm({ fromText, toText, setFromText, setToText, onSubmit, error }) {
   const swap = () => { setFromText(toText); setToText(fromText); };
   const useMyLocation = () => setFromText(stations.vaishali);
 
   return (
+     <AnimatedBackground>
+
     <form
       className="card search"
       onSubmit={(e) => { e.preventDefault(); onSubmit(); }}
@@ -50,5 +55,6 @@ export default function SearchForm({ fromText, toText, setFromText, setToText, o
         <FaSearch /> Get Route
       </button>
     </form>
+    </AnimatedBackground>
   );
 }
