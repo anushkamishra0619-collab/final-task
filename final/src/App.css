@@ -26,18 +26,29 @@ body {
   font-family: "Poppins", system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
+  position:relative;
+  height:100vh;
+
+
 }
+
 h1, h2, h3, h4, p { margin: 0; }
 button { font-family: inherit; }
+
 
 .card {
   background: var(--card);
   border-radius: 20px;
   padding: 18px;
-  margin: auto;
+  margin:auto;
   box-shadow: var(--shadow);
-  
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
 }
+
+
 .card.top { border: 2px solid var(--primary); }
 
 .field {
@@ -199,7 +210,7 @@ button { font-family: inherit; }
 
 .search-page {
   min-height: calc(100vh - 64px);
-  background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLTP3Ldwj-kf50h8ktudBAVPCN7AdWyo_4TWGNM-CWng&s=10");
+  background-image: url("https://images.openai.com/static-rsc-4/tqJ-raq2TIeI8DDmWy_4hgGJoS9c5zNIJWAkeaszMv__WlbOPwoR-ciuNFmAuX3Zn8k7YKY2QPEJZLvdG0e-Ke_PKV_Lia5y8nXSwSP6uJ-zfGzKfFpzaHk1uMh-MUcLAS2zFxoxfoELxq8xbFqat1HjlRp0ogHE7gTNTiyoRcMxstNdCBCZLHCQahKXUCcS?purpose=fullsize");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
