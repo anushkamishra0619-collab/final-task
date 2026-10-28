@@ -32,8 +32,11 @@ export default function LandingPage({ onAuth }) {
 
   return (
     <div className="landing">
-      <section className="hero">
+      <header className="landing-header">
+
         <Logo size="lg" />
+        </header>
+        <section className="hero">
         <h1>Don't just find a route.<br />Find <em>your</em> route.</h1>
         <p>
           RouteWise compares every journey on time, fare, walking, transfers and
