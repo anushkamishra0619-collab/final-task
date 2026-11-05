@@ -557,3 +557,67 @@ tbody tr:last-child td { border-bottom: none; }
 @media (prefers-reduced-motion: reduce) {
   .demo *, .demo-screen { animation: none !important; }
 }
+/* ================= LANDING FOOTER ================= */
+.lf {
+  width: 100%;
+  margin: 0;
+  background: #0e0e10;
+  color: #f5f5f2;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  position: relative;
+}
+.lf::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 5px;
+  background: var(--bar);
+}
+.lf-inner { padding: 56px 5vw 24px; }
+
+.lf-grid {
+  display: grid; grid-template-columns: 1.5fr 1fr 1fr 1.2fr; gap: 40px;
+}
+.lf-brand p {
+  margin: 18px 0 22px; color: #a3a3ad; line-height: 1.7;
+  font-size: 15px; max-width: 340px;
+}
+
+.lf-social { display: flex; gap: 10px; }
+.lf-social a {
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.14); color: #f5f5f2;
+  display: grid; place-items: center; font-size: 17px; transition: 0.2s;
+}
+.lf-social a:hover { background: #c6f24e; color: #0e0e10; border-color: #c6f24e; transform: translateY(-3px); }
+
+.lf-col { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.lf-col h4 { font-size: 12px; font-weight: 700; letter-spacing: 0.16em; color: #c3b2f7; margin-bottom: 6px; }
+.lf-col button {
+  background: none; border: none; padding: 0; cursor: pointer; text-align: left;
+  color: #a3a3ad; font-size: 15px; transition: color 0.2s, transform 0.2s;
+}
+.lf-col button:hover { color: #c6f24e; transform: translateX(4px); }
+.lf-contact { display: flex; align-items: center; gap: 10px; color: #a3a3ad; font-size: 15px; text-decoration: none; }
+.lf-contact svg { color: #c6f24e; flex-shrink: 0; }
+a.lf-contact:hover { color: #f5f5f2; }
+
+.lf-bottom {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+  margin-top: 40px; padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  color: #a3a3ad; font-size: 14px;
+}
+.lf-legal { display: flex; gap: 20px; }
+.lf-legal button { background: none; border: none; padding: 0; cursor: pointer; color: #a3a3ad; font-size: 14px; }
+.lf-legal button:hover { color: #c6f24e; }
+.lf-bottom strong { color: #c6f24e; font-weight: 700; }
+
+@media (max-width: 900px) {
+  .lf-inner { padding: 44px 24px 20px; }
+  .lf-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .lf-brand { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .lf-inner { padding: 36px 18px 20px; }
+  .lf-grid { grid-template-columns: 1fr; }
+  .lf-bottom { flex-direction: column; align-items: flex-start; gap: 10px; }
+}

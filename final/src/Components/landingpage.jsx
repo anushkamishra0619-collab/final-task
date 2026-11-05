@@ -5,6 +5,7 @@ import {
 } from "react-icons/fa";
 import Logo from "./logo";
 import HowToDemo from "./HowToDemo";
+import LandingFooter from "./LandingFooter";
 
 const FEATURES = [
   { Icon: FaClock, text: "Travel time" },
@@ -66,6 +67,7 @@ export default function LandingPage({ onAuth }) {
           </div>
         </section>
       </div>
+            <LandingFooter onPlan={() => openAuth("signup")} />
 
       {/* ---------- SIGN IN / SIGN UP POPUP ---------- */}
       {open && (
