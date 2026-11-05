@@ -1,8 +1,10 @@
 import { useState } from "react";
 import {
   FaEnvelope, FaLock, FaUser, FaClock, FaRupeeSign, FaWalking, FaShieldAlt,
+  FaTimes,
 } from "react-icons/fa";
 import Logo from "./logo";
+import HowToDemo from "./HowToDemo";
 
 const FEATURES = [
   { Icon: FaClock, text: "Travel time" },
@@ -12,11 +14,15 @@ const FEATURES = [
 ];
 
 export default function LandingPage({ onAuth }) {
-  const [mode, setMode] = useState("signin");
+  const [open, setOpen] = useState(false);          // is the popup open?
+  const [mode, setMode] = useState("signin");       // "signin" | "signup"
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
 
   const update = (key) => (e) => setForm({ ...form, [key]: e.target.value });
+
+  const openAuth = (m) => { setMode(m); setError(""); setOpen(true); };
+  const closeAuth = () => { setOpen(false); setError(""); };
 
   const submit = (e) => {
     e.preventDefault();
@@ -32,54 +38,79 @@ export default function LandingPage({ onAuth }) {
 
   return (
     <div className="landing">
-      <header className="landing-header">
-
+      {/* ---------- NAVBAR ---------- */}
+      <nav className="landing-nav">
         <Logo size="lg" />
-        </header>
+        <div className="nav-actions">
+          <button className="nav-btn ghost" onClick={() => openAuth("signin")}>Sign in</button>
+          <button className="nav-btn solid" onClick={() => openAuth("signup")}>Sign up</button>
+        </div>
+      </nav>
+
+      {/* ---------- BODY: visual left, text right ---------- */}
+      <div className="landing-body">
+        <div className="demo-panel">
+          <HowToDemo />
+        </div>
+
         <section className="hero">
-        <h1>Don't just find a route.<br />Find <em>your</em> route.</h1>
-        <p>
-          RouteWise compares every journey on time, fare, walking, transfers and
-          reliability, then explains which one fits you best.
-        </p>
-        <div className="feature-chips">
-          {FEATURES.map(({ Icon, text }) => (
-            <span key={text} className="chip static"><Icon /> {text}</span>
-          ))}
-        </div>
-      </section>
-
-      <form className="card auth-card" onSubmit={submit}>
-        <div className="tabs">
-          <button type="button" className={mode === "signin" ? "active" : ""}
-                  onClick={() => { setMode("signin"); setError(""); }}>Sign in</button>
-          <button type="button" className={mode === "signup" ? "active" : ""}
-                  onClick={() => { setMode("signup"); setError(""); }}>Sign up</button>
-        </div>
-
-        <h2>{mode === "signin" ? "Welcome back" : "Create your account"}</h2>
-
-        {mode === "signup" && (
-          <div className="field">
-            <FaUser className="field-icon" />
-            <input placeholder="Full name" value={form.name} onChange={update("name")} />
+          <h1>Don't just find a route.<br />Find <em>your</em> route.</h1>
+          <p>
+            RouteWise compares every journey on time, fare, walking, transfers and
+            reliability, then explains which one fits you best.
+          </p>
+          <div className="feature-chips">
+            {FEATURES.map(({ Icon, text }) => (
+              <span key={text} className="chip static"><Icon /> {text}</span>
+            ))}
           </div>
-        )}
-        <div className="field">
-          <FaEnvelope className="field-icon" />
-          <input type="email" placeholder="Email" value={form.email} onChange={update("email")} />
-        </div>
-        <div className="field">
-          <FaLock className="field-icon" />
-          <input type="password" placeholder="Password" value={form.password} onChange={update("password")} />
-        </div>
+        </section>
+      </div>
 
-        {error && <p className="error">{error}</p>}
+      {/* ---------- SIGN IN / SIGN UP POPUP ---------- */}
+      {open && (
+        <div className="modal-backdrop" onClick={closeAuth}>
+          <form
+            className="card auth-card"
+            onSubmit={submit}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button type="button" className="modal-close" onClick={closeAuth} aria-label="Close">
+              <FaTimes />
+            </button>
 
-        <button className="primary-btn" type="submit">
-          {mode === "signin" ? "Sign in" : "Create account"}
-        </button>
-      </form>
+            <div className="tabs">
+              <button type="button" className={mode === "signin" ? "active" : ""}
+                      onClick={() => { setMode("signin"); setError(""); }}>Sign in</button>
+              <button type="button" className={mode === "signup" ? "active" : ""}
+                      onClick={() => { setMode("signup"); setError(""); }}>Sign up</button>
+            </div>
+
+            <h2>{mode === "signin" ? "Welcome back" : "Create your account"}</h2>
+
+            {mode === "signup" && (
+              <div className="field">
+                <FaUser className="field-icon" />
+                <input placeholder="Full name" value={form.name} onChange={update("name")} />
+              </div>
+            )}
+            <div className="field">
+              <FaEnvelope className="field-icon" />
+              <input type="email" placeholder="Email" value={form.email} onChange={update("email")} />
+            </div>
+            <div className="field">
+              <FaLock className="field-icon" />
+              <input type="password" placeholder="Password" value={form.password} onChange={update("password")} />
+            </div>
+
+            {error && <p className="error">{error}</p>}
+
+            <button className="primary-btn" type="submit">
+              {mode === "signin" ? "Sign in" : "Create account"}
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
