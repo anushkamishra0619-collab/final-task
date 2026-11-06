@@ -3,12 +3,14 @@ import {
   FaClock, FaRupeeSign, FaStar, FaExchangeAlt, FaShieldAlt,
 } from "react-icons/fa";
 import { stations } from "../data/network";
-import { explainRoute, describeRoute } from "../data/explain";
+import { whyThisRoute } from "../data/explain";
+import { MODE_LABEL } from "../data/fare";
 
 const MODE_ICON = { walk: FaWalking, bus: FaBus, metro: FaSubway, cab: FaTaxi, train: FaTrain };
 
 export default function RouteCard({ route, all, rank }) {
-  const notes = explainRoute(route, all);
+  const { pros, cons } = whyThisRoute(route, all);
+  const notes = [...pros, ...cons];
 
   return (
     <div className={`card route ${rank === 0 ? "top" : ""}`}>
@@ -26,7 +28,9 @@ export default function RouteCard({ route, all, rank }) {
         </div>
       </div>
 
-      <p className="desc">{describeRoute(route)}</p>
+      <p className="desc">
+        {route.legs.map((leg) => `${MODE_LABEL[leg.mode] || leg.mode} (${leg.line})`).join(" → ")}
+      </p>
 
       <div className="stats">
         <span><FaWalking /> {route.walk} m</span>

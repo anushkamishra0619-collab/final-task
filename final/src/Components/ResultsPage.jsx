@@ -1,100 +1,57 @@
-import { useEffect, useMemo, useState } from "react";
-import { FaArrowLeft, FaSlidersH, FaTrophy, FaBus } from "react-icons/fa";
-import { coords, edges, stations } from "../data/network";
+import { useMemo, useState } from "react";
+import { FaArrowLeft, FaSlidersH } from "react-icons/fa";
+import { edges, stations, coords } from "../data/network";
+import { distanceKm } from "../data/places";
 import { buildGraph, findRoutes } from "../data/graph";
 import { computeMetrics } from "../data/metrics";
-import { fetchRoadDistanceKm } from "../data/fare";
 import { scoreRoutes, addLabels } from "../data/scoring";
 import Preferences from "./Preferences";
+import RouteCard from "./RouteCard";
 import CompareTable from "./CompareTable";
-import RouteDetail from "./RouteDetail";
 
-const graph = buildGraph(edges);
+const SORTS = [
+  { key: "time", label: "Fastest" },
+  { key: "score", label: "Best Balanced" },
+  { key: "fare", label: "Cheapest" },
+  { key: "walk", label: "Least Walking" },
+];
 
-export default function ResultsPage({ fromId, toId, weights, setWeights, onBack }) {
+// A real city network is huge, so keep only stations near the trip.
+// This keeps the all-routes search fast.
+function corridor(all, fromId, toId, slack = 1.3) {
+  const A = coords[fromId], B = coords[toId];
+  const direct = distanceKm(A, B);
+  const memo = new Map();
+  const inside = (id) => {
+    if (!memo.has(id)) {
+      const c = coords[id];
+      memo.set(id, !!c && distanceKm(A, c) + distanceKm(c, B) <= direct * slack + 1.5);
+    }
+    return memo.get(id);
+  };
+  return all.filter((e) => inside(e.from) && inside(e.to));
+}
+
+export default function ResultsPage({ fromId, toId, extraEdges, weights, setWeights, onBack }) {
+  const [sortKey, setSortKey] = useState("time");
   const [showPrefs, setShowPrefs] = useState(false);
-  const [selected, setSelected] = useState(null);
-  const [roadDistanceResult, setRoadDistanceResult] = useState({
-    key: "",
-    distances: {},
-    status: "idle",
-    error: "",
-  });
 
-  const paths = useMemo(
-    () => findRoutes(graph, fromId, toId, { maxRoutes: 500 }),
-    [fromId, toId],
+  const graph = useMemo(
+    () => buildGraph(corridor([...edges, ...extraEdges], fromId, toId)),
+    [extraEdges, fromId, toId]
   );
 
-  const carEdges = useMemo(() => {
-    const uniqueEdges = new Map();
-    paths.flat().forEach((edge) => {
-      if (edge.mode === "car") {
-        uniqueEdges.set(`${edge.from}>${edge.to}`, edge);
-      }
-    });
-    return [...uniqueEdges.values()];
-  }, [paths]);
-  const roadDistanceKey = carEdges.map((edge) => `${edge.from}>${edge.to}`).join(",");
+  const routes = useMemo(
+    () => findRoutes(graph, fromId, toId).slice(0, 300).map((p, i) => computeMetrics(p, i)),
+    [graph, fromId, toId]
+  );
 
-  useEffect(() => {
-    if (carEdges.length === 0) return undefined;
+  const ranked = useMemo(() => addLabels(scoreRoutes(routes, weights)), [routes, weights]);
 
-    const controller = new AbortController();
-    Promise.all(carEdges.map(async (edge) => {
-      const distance = await fetchRoadDistanceKm(
-        coords[edge.from],
-        coords[edge.to],
-        controller.signal,
-      );
-      return [`${edge.from}>${edge.to}`, distance];
-    }))
-      .then((entries) => {
-        setRoadDistanceResult({
-          key: roadDistanceKey,
-          distances: Object.fromEntries(entries),
-          status: "loaded",
-          error: "",
-        });
-      })
-      .catch((error) => {
-        if (error.name !== "AbortError") {
-          setRoadDistanceResult({
-            key: roadDistanceKey,
-            distances: {},
-            status: "error",
-            error: error.message,
-          });
-        }
-      });
-
-    return () => controller.abort();
-  }, [carEdges, roadDistanceKey]);
-
-  const hasCurrentRoadDistances = roadDistanceResult.key === roadDistanceKey;
-  const roadDistanceStatus = carEdges.length === 0
-    ? "idle"
-    : hasCurrentRoadDistances ? roadDistanceResult.status : "loading";
-
-  const ranked = useMemo(() => {
-    const distanceOverrides = roadDistanceResult.key === roadDistanceKey
-      ? roadDistanceResult.distances
-      : {};
-    const routes = paths.map((path, i) => computeMetrics(path, i, distanceOverrides));
-    return addLabels(scoreRoutes(routes, weights));
-  }, [paths, roadDistanceKey, roadDistanceResult, weights]);
-  if (selected) {
-    return (
-      <RouteDetail
-        route={selected.route}
-        all={ranked}
-        title={selected.title}
-        onBack={() => setSelected(null)}
-      />
-    );
-  }
-
-  const best = ranked.find((r) => r.labels.includes("Best Balanced"));
+  const shown = useMemo(
+    () => [...ranked].sort((a, b) => a[sortKey] - b[sortKey]),
+    [ranked, sortKey]
+  );
 
   return (
     <section className="results">
@@ -103,65 +60,34 @@ export default function ResultsPage({ fromId, toId, weights, setWeights, onBack 
       </button>
 
       <div className="results-head">
-        <h2>Compare All Routes</h2>
-        <p>
-          {stations[fromId]} → {stations[toId]} · See how each option performs
-          across different factors.
-        </p>
-        <p className="data-note">
-          Car fares use live road distances from OpenStreetMap OSRM when available;
-          other modes use estimated per-kilometre fares.
-        </p>
-        {roadDistanceStatus === "loading" && (
-          <p className="data-status" role="status">Fetching live road distances for car routes…</p>
-        )}
-        {roadDistanceStatus === "loaded" && (
-          <p className="data-status" role="status">Live road distances loaded; car fares are recalculated.</p>
-        )}
-        {roadDistanceStatus === "error" && (
-          <p className="data-error" role="alert">
-            Live road distances are unavailable
-            {roadDistanceResult.error ? ` (${roadDistanceResult.error})` : ""}.
-            Showing estimates based on the configured route distances.
-          </p>
-        )}
+        <h2>{stations[fromId]} → {stations[toId]}</h2>
+        <p>{ranked.length} route{ranked.length === 1 ? "" : "s"} found</p>
       </div>
 
       <div className="sort-row">
+        {SORTS.map(({ key, label }) => (
+          <button
+            key={key}
+            className={`chip ${sortKey === key ? "active" : ""}`}
+            onClick={() => setSortKey(key)}
+          >
+            {label}
+          </button>
+        ))}
         <button className="chip" onClick={() => setShowPrefs(!showPrefs)}>
           <FaSlidersH /> Preferences
         </button>
       </div>
+
       {showPrefs && <Preferences weights={weights} setWeights={setWeights} />}
 
-      {ranked.length === 0 && <p className="empty">No route found between these stations.</p>}
+      {ranked.length === 0 && <p className="empty">No route found between these places.</p>}
 
-      {ranked.length > 0 && (
-        <>
-          <CompareTable routes={ranked} onView={(route, title) => setSelected({ route, title })} />
+      {shown.slice(0, 5).map((r, i) => (
+        <RouteCard key={r.id} route={r} all={ranked} rank={i} />
+      ))}
 
-          {best && (
-            <div className="card reco">
-              <FaTrophy className="reco-trophy" />
-              <div>
-                <small>Our Recommendation</small>
-                <h3>Best Balanced Route</h3>
-                <p>
-                  A great mix of time, cost, walking and reliability
-                  ({best.time} min · ₹{best.fare}).
-                </p>
-                <button
-                  className="view-btn"
-                  onClick={() => setSelected({ route: best, title: "Best Balanced Route" })}
-                >
-                  View
-                </button>
-              </div>
-              <FaBus className="reco-bus" />
-            </div>
-          )}
-        </>
-      )}
+      {ranked.length > 0 && <CompareTable routes={shown} />}
     </section>
   );
 }
