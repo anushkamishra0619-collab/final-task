@@ -369,7 +369,7 @@ input { font-family: inherit; }
 .sx {
   position: relative; width: 100%; max-width: 460px;
   padding: 28px 22px 22px; border-radius: 30px;
-  background: rgba(14, 14, 16, 0.9);
+  background: rgb(24, 24, 30);
   backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 28px 80px rgba(0, 0, 0, 0.6);

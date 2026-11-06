@@ -21,7 +21,7 @@ export default function App() {
   const [page, setPage] = useState("home"); // "home" | "results"
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
-  const [dark, setDark] = useState(true);
+  const [dark, setDark] = useState(false);
 
   const [net, setNet] = useState("loading"); // "loading" | "ready" | "error"
   const [fromText, setFromText] = useState("");
