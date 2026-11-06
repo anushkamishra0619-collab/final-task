@@ -67,8 +67,7 @@ input { font-family: inherit; }
 }
 .card.top { border-color: var(--lime); }
 .card.top::before,
-.auth-card::before,
-.search::before {
+.auth-card::before {
   content: "";
   position: absolute; inset: 0 0 auto 0; height: 5px;
   background: var(--bar);
@@ -359,9 +358,135 @@ input { font-family: inherit; }
 .pin { position: absolute !important; color: var(--lime); font-size: 32px; opacity: 0.9; z-index: 1; }
 .p1 { top: 62%; left: 12%; } .p2 { top: 78%; right: 16%; } .p3 { top: 48%; right: 8%; }
 
-.search { width: 100%; max-width: 480px; padding: 28px; margin: 0 0 14px; border-radius: 28px; }
-.search h2 { font-size: 36px; font-weight: 800; letter-spacing: -0.05em; margin: 4px 0 10px; }
-.search .primary-btn { margin-top: 16px; }
+/* ================= SEARCH FORM (Clinch route card) ================= */
+.sx-stage {
+  width: 100%; min-height: calc(100vh - 68px);
+  display: grid; place-items: center;
+  padding: 28px 16px; position: relative; z-index: 2;
+}
+.sx {
+  position: relative; width: 100%; max-width: 460px;
+  padding: 28px 22px 22px; border-radius: 30px;
+  background: rgba(14, 14, 16, 0.9);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.6);
+  color: #f5f5f2;
+}
+.sx::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 6px;
+  border-radius: 30px 30px 0 0; background: var(--bar);
+}
+
+.sx-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #c3b2f7;
+  padding: 6px 12px; border-radius: 999px;
+  background: #1f1f25; border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.sx-chip i {
+  width: 7px; height: 7px; border-radius: 50%; background: #c6f24e;
+  animation: sxPulse 1.8s ease-in-out infinite;
+}
+.sx h2 {
+  font-size: clamp(34px, 6vw, 46px); font-weight: 800;
+  letter-spacing: -0.05em; line-height: 1; margin: 14px 0 6px;
+}
+.sx h2 b { color: #c6f24e; }
+.sx-sub { color: #a3a3ad; font-size: 15px; margin-bottom: 18px; }
+
+/* route: dotted rail + two fields */
+.sx-route { display: grid; grid-template-columns: 18px 1fr; gap: 12px; }
+.sx-rail {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: space-between; padding: 27px 0; color: #c6f24e; font-size: 17px;
+}
+.sx-rail span { flex: 1; margin: 6px 0; border-left: 2px dotted rgba(255, 255, 255, 0.28); }
+.sx-from-dot { width: 13px; height: 13px; border-radius: 50%; border: 2px solid #c6f24e; }
+
+.sx-fields { display: grid; gap: 12px; }
+.sx-field {
+  position: relative; display: flex; align-items: center; gap: 8px;
+  height: 54px; padding: 0 8px 0 16px; border-radius: 16px;
+  background: #1f1f25; border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.sx-field.focus {
+  border-color: #c6f24e; box-shadow: 0 0 0 3px rgba(198, 242, 78, 0.16);
+}
+.sx-field input {
+  flex: 1; min-width: 0; border: 0; outline: 0; background: transparent;
+  color: #f5f5f2; font: inherit; font-size: 16px; height: 100%;
+}
+.sx-field input::placeholder { color: #8d8d99; }
+.sx-ok { color: #c6f24e; font-size: 16px; flex-shrink: 0; }
+.sx-iconbtn {
+  width: 38px; height: 38px; flex-shrink: 0; border: 0; cursor: pointer;
+  border-radius: 12px; background: transparent; color: #a3a3ad;
+  display: grid; place-items: center; font-size: 15px; transition: 0.2s;
+}
+.sx-iconbtn:hover { background: #c6f24e; color: #0e0e10; }
+.sx-swap svg { transform: rotate(90deg); }
+
+/* suggestions dropdown */
+.sx-sug {
+  position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 20;
+  list-style: none; margin: 0; padding: 6px;
+  background: #26262e; border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 16px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+}
+.sx-sug button {
+  width: 100%; display: flex; align-items: center; gap: 10px;
+  padding: 11px 12px; border: 0; border-radius: 10px; cursor: pointer;
+  background: transparent; color: #f5f5f2; font: inherit; font-size: 15px; text-align: left;
+}
+.sx-sug button svg { color: #c6f24e; font-size: 14px; }
+.sx-sug button:hover { background: rgba(198, 242, 78, 0.12); }
+
+/* quick places */
+.sx-quick { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 16px 0 18px; }
+.sx-quick em {
+  font-style: normal; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.14em; color: #8d8d99; margin-right: 2px;
+}
+.sx-quick button {
+  cursor: pointer; font: inherit; font-size: 13px; font-weight: 600;
+  padding: 8px 14px; border-radius: 999px; color: #f5f5f2;
+  background: transparent; border: 1px solid rgba(255, 255, 255, 0.16); transition: 0.2s;
+}
+.sx-quick button:hover { border-color: #c6f24e; }
+.sx-quick button.on { background: #c6f24e; color: #0e0e10; border-color: #c6f24e; }
+
+.sx-error {
+  margin: 0 0 14px; padding: 10px 14px; border-radius: 12px; font-size: 14px;
+  color: #ff8a8a; background: rgba(255, 107, 107, 0.12);
+  border: 1px solid rgba(255, 107, 107, 0.35);
+}
+
+.sx-submit {
+  width: 100%; height: 56px; border: 0; cursor: pointer; border-radius: 16px;
+  background: #c6f24e; color: #0e0e10; font: inherit; font-size: 17px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.sx-submit svg { transition: transform 0.2s; }
+.sx-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(198, 242, 78, 0.3); }
+.sx-submit:hover svg { transform: translateX(4px); }
+.sx-submit.ready { animation: sxGlow 2s ease-in-out infinite; }
+
+@keyframes sxPulse { 50% { opacity: 0.3; transform: scale(0.8); } }
+@keyframes sxGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(198, 242, 78, 0.35); }
+  50% { box-shadow: 0 0 0 8px rgba(198, 242, 78, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sx-chip i, .sx-submit.ready { animation: none; }
+}
+@media (max-width: 480px) {
+  .sx { padding: 24px 16px 18px; border-radius: 26px; }
+  .sx::before { border-radius: 26px 26px 0 0; }
+  .sx-route { gap: 8px; }
+}
 
 .top-places {
   width: 100%; max-width: 480px;
@@ -446,8 +571,6 @@ tbody tr:last-child td { border-bottom: none; }
 }
 @media (max-width: 560px) {
   .card { padding: 18px; border-radius: 20px; }
-  .search { padding: 22px; }
-  .search h2 { font-size: 30px; }
   .results { padding: 18px 12px 48px; }
   .summary { font-size: 19px; }
   .slider-row { grid-template-columns: 1fr 28px; }
@@ -620,4 +743,44 @@ a.lf-contact:hover { color: #f5f5f2; }
   .lf-inner { padding: 36px 18px 20px; }
   .lf-grid { grid-template-columns: 1fr; }
   .lf-bottom { flex-direction: column; align-items: flex-start; gap: 10px; }
+}
+/* ================= ANIMATED ROUTE BACKGROUND ================= */
+.ab {
+  position: relative; overflow: hidden;
+  min-height: calc(100vh - 68px);
+  background:
+    radial-gradient(circle at 16% 10%, rgba(139, 92, 246, 0.45), transparent 45%),
+    radial-gradient(circle at 88% 88%, rgba(34, 211, 238, 0.22), transparent 45%),
+    radial-gradient(circle at 70% 20%, rgba(244, 114, 182, 0.14), transparent 40%),
+    #0b0b14;
+}
+.ab-svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+.ab-content { position: relative; z-index: 1; }
+
+.ab-contour ellipse { stroke: rgba(195, 178, 247, 0.12); stroke-width: 1.5; }
+
+.ab-star { fill: #fff; opacity: 0.5; animation: abTwinkle 3.2s ease-in-out infinite; }
+@keyframes abTwinkle { 50% { opacity: 0.1; } }
+
+.ab-draw {
+  stroke-dasharray: 100; stroke-dashoffset: 100;
+  animation: abDraw 2.2s ease forwards;
+}
+@keyframes abDraw { to { stroke-dashoffset: 0; } }
+
+.ab-flow { animation: abFlow 6s linear infinite; }
+@keyframes abFlow { to { stroke-dashoffset: -150; } }
+
+.ab-ring { opacity: 0; animation: abPing 2.8s ease-out infinite; }
+@keyframes abPing {
+  0%   { transform: scale(1);   opacity: 0.7; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+/* let the map show through the card a little */
+.sx { background: rgba(14, 14, 16, 0.8); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ab-draw { animation: none; stroke-dashoffset: 0; }
+  .ab-flow, .ab-ring, .ab-star { animation: none; }
 }

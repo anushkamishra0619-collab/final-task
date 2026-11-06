@@ -7,6 +7,7 @@ import Sidebar from "./Components/sidebar";
 import AboutPanel from "./Components/AboutPanel";
 import SearchForm from "./Components/SearchForm";
 import ResultsPage from "./Components/ResultsPage";
+import AnimatedBackground from "./AnimatedBackground";
 import "./App.css";
 
 function loadUser() {
@@ -85,11 +86,13 @@ export default function App() {
 
       <main className={page === "home" ? "search-page" : undefined}>
         {page === "home" ? (
-          <SearchForm
-            fromText={fromText} toText={toText}
-            setFromText={setFromText} setToText={setToText}
-            onSubmit={getRoute} error={error}
-          />
+          <AnimatedBackground>
+            <SearchForm
+              fromText={fromText} toText={toText}
+              setFromText={setFromText} setToText={setToText}
+              onSubmit={getRoute} error={error}
+            />
+          </AnimatedBackground>
         ) : (
           <ResultsPage
             fromId={fromId} toId={toId}
